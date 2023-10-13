@@ -1,0 +1,16 @@
+{
+    "name": "dynamic_server",
+    "description": "Dynamic Server",
+    "version": "1.0.0",
+    "author": {
+        "name": "",
+        "email": ""
+    },
+    "contributors": [
+    ],
+    "repository": {},
+    "dependencies": {
+        "express": "^4.18.2",
+        "sqlite3": "^5.1.6"
+    }
+}
