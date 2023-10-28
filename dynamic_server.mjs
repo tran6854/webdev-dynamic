@@ -22,23 +22,57 @@ const db = new sqlite3.Database(path.join(__dirname, 'airline.sqlite3'), sqlite3
     }
 });
 
-app.get('/km/:eq/:num', (req, res)=>{
-    let equality = req.params.eq;
+let makeBarGraph = function(data, label, col, page){
+    let graphData;
+    let columns = [];
+    let b = (page-1)*10;
+    let e = b+10;
+    if(e>data.length){
+        e = data.length;
+    }
+    col.forEach(colData => {
+        columns.push({title:colData, labels:[], y:[]});
+    });
+    for(let i=b; i<e; i++){
+        for(let j=0; j<columns.length; j++){
+            columns[j].labels.push(data[i][label]);
+            columns[j].y.push(data[i][col[j]]);
+        }
+    }
+    graphData = 'data:[\n';
+    for(let i=0; i<columns.length; i++){
+        graphData += '{type:"stackedBar",\n';
+        graphData += 'name:"'+ columns[i].title+'",\n';
+        graphData += 'showInLegend: "true",\ndataPoints: [\n';
+        for(let j=0; j<columns[i].labels.length; j++){
+            graphData += '{ y:'+columns[i].y[j]+', label: "'+columns[i].labels[j]+'" },\n';
+        }
+        graphData += ']\n';
+        graphData += '},\n';
+    }
+    graphData += ']';
+    return graphData;
+};
+
+app.get('/km/:eq/:num/:page', (req, res)=>{
+    let eq = req.params.eq
+    let equality;
     let num = req.params.num;
+    let page = req.params.page;
     let symb = '';
-    if(equality == 'eq'){
+    if(eq == 'eq'){
         equality = '=';
         symb = '=';
-    }else if(equality == 'lt'){
+    }else if(eq == 'lt'){
         equality = '<';
         symb = '<';
-    }else if(equality == 'gt'){
+    }else if(eq == 'gt'){
         equality = '>';
         symb = '>';
-    }else if(equality == 'lte'){
+    }else if(eq == 'lte'){
         equality = '<=';
         symb = '≤';
-    }else if(equality == 'gte'){
+    }else if(eq == 'gte'){
         equality = '>=';
         symb = '≥';
     }
@@ -56,14 +90,20 @@ app.get('/km/:eq/:num', (req, res)=>{
     let send = function(airlineData){
         fs.readFile(path.join(template,"/temp.html"), 'utf-8', (err, data)=>{
             let response;
-            let table = makeTable(
-                ["Airline", "ASK", "i89", "fa89", "f89", "i01", "fa01", "f01"],
-                airlineData,
-                ["airline",  "avail_seat_km_per_week",
-                "incidents_85_99",  "fatal_accidents_85_99",  "fatalities_85_99",
-                "incidents_00_14",  "fatal_accidents_00_14",  "fatalities_00_14"]
-            );
-            response = data.replace('$$DATA$$', table);
+            let begin = (page-1)*10;
+            let prev = page==1?'<span style="color:gray">Prev</span>':'<a href="/km/'+eq+'/'+num+'/'+(parseInt(page)-1)+'">Prev</a>';
+            let next = airlineData.length-10<begin?'<span style="color:gray">Next</span>':'<a href="/km/'+eq+'/'+num+'/'+(parseInt(page)+1)+'">Next</a>';
+            if(page<=0||begin >= airlineData.length){
+                res.status(404).type('html').send("Could not find");
+                return;
+            }
+            let graph = makeBarGraph(airlineData, "airline",
+                ["incidents_85_99",  "fatal_accidents_85_99",  "fatalities_85_99",
+                "incidents_00_14",  "fatal_accidents_00_14",  "fatalities_00_14"],
+                page);
+            response = data.replace('//$$GRAPH$$', graph);
+            response = response.replace('$$PREV$$', prev);
+            response = response.replace('$$NEXT$$', next);
             response = response.replace('$$TITLE$$', "Airline Data Filtered By Available Seat km/week: "+symb+num);
             res.status(200).type('html').send(response);
         });

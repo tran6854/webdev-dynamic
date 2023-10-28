@@ -9,17 +9,17 @@
 <body>
     <h1>Flights</h1>
     <p>Choose a filter</p>
-    <div id = "radio1"><input type="radio" id="airline"><label for="airline">Airline</label></div>
-    <div id = "radio2"><input type="radio" id="ask"><label for="ask">ASK / Week</label></div>
-    <div id = "radio3"><input type="radio" id="date"><label for="date">Date Range</label></div>
+    <input type="radio" id="airline"><label id = "radio-label1" for="airline">Airline</label>
+    <input type="radio" id="ask"><label id = "radio-label2" for="ask">ASK / Week</label>
+    <input type="radio" id="date"><label id = "radio-label3" for="date">Date Range</label>
     <div id="filter"></div>
 
 
 
     <script>
-        let radio1 = document.getElementById("radio1");
-        let radio2 = document.getElementById("radio2");
-        let radio3 = document.getElementById("radio3");
+        let radio1 = document.getElementById("radio-label1");
+        let radio2 = document.getElementById("radio-label2");
+        let radio3 = document.getElementById("radio-label3");
         let radioData1 = document.getElementById("airline");
         let radioData2 = document.getElementById("ask");
         let radioData3 = document.getElementById("date");
@@ -34,6 +34,9 @@
         radio1.addEventListener('mouseup', check);
         radio2.addEventListener('mouseup', check);
         radio3.addEventListener('mouseup', check);
+        radioData1.addEventListener('mouseup', check);
+        radioData2.addEventListener('mouseup', check);
+        radioData3.addEventListener('mouseup', check);
 
 
         radio2.addEventListener('mouseup', filterAsk);
@@ -80,7 +83,7 @@
         function test(){
             let equality = document.getElementById('EQ').value;
             let num = document.getElementById('KM-NUM').value;
-            window.location.replace('/km/'+equality+"/"+num);
+            window.location.replace('/km/'+equality+"/"+num+"/1");
             return false;
         }
 
