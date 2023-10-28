@@ -40,6 +40,7 @@
 
 
         radio2.addEventListener('mouseup', filterAsk);
+        radioData2.addEventListener('mouseup', filterAsk);
 
         let filter = document.getElementById('filter');
         function filterAsk(){
@@ -50,7 +51,7 @@
             let lt = makeElement('option', {value:'lt', text:'<'});
             let gte = makeElement('option', {value:'gte', text:'≥'});
             let lte = makeElement('option', {value:'lte', text:'≤'});
-            let numInput = makeElement('input', {id: 'KM-NUM', type: 'number'});
+            let numInput = makeElement('input', {id: 'KM-NUM', type: 'number', min: '0'});
             let submit = makeElement('input', {type: 'submit', name: 'Search'});
             link(select, [eq, gt, lt, gte, lte]);
             link(form, [select, numInput, submit]);

@@ -100,7 +100,7 @@ app.get('/km/:eq/:num/:page', (req, res)=>{
             let response;
             let begin = (page-1)*10;
             let prev = page==1?'<span style="color:gray">Prev</span>':'<a href="/km/'+eq+'/'+num+'/'+(parseInt(page)-1)+'">Prev</a>';
-            let next = airlineData.length-10<begin?'<span style="color:gray">Next</span>':'<a href="/km/'+eq+'/'+num+'/'+(parseInt(page)+1)+'">Next</a>';
+            let next = airlineData.length-10<=begin?'<span style="color:gray">Next</span>':'<a href="/km/'+eq+'/'+num+'/'+(parseInt(page)+1)+'">Next</a>';
             if(page<=0||begin >= airlineData.length){
                 res.status(404).type('html').send("Could not find");
                 return;
