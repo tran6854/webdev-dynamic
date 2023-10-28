@@ -23,6 +23,8 @@
         let radioData1 = document.getElementById("airline");
         let radioData2 = document.getElementById("ask");
         let radioData3 = document.getElementById("date");
+
+        let currentInput;
         
         function check(){
             radioData1.checked = false;
@@ -53,6 +55,7 @@
             let lte = makeElement('option', {value:'lte', text:'≤'});
             let numInput = makeElement('input', {id: 'KM-NUM', type: 'number', min: '0'});
             let submit = makeElement('input', {type: 'submit', name: 'Search'});
+            currentInput = numInput;
             link(select, [eq, gt, lt, gte, lte]);
             link(form, [select, numInput, submit]);
             filter.appendChild(form);
@@ -82,6 +85,10 @@
         }
 
         function test(){
+            if(currentInput.value == ''){
+                alert('TEXT FIELD CANNOT BE EMPTY');
+                return;
+            }
             let equality = document.getElementById('EQ').value;
             let num = document.getElementById('KM-NUM').value;
             window.location.replace('/km/'+equality+"/"+num+"/1");
