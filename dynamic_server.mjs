@@ -22,7 +22,7 @@ const db = new sqlite3.Database(path.join(__dirname, 'airline.sqlite3'), sqlite3
     }
 });
 
-let makeBarGraph = function(data, label, col, page){
+let makeBarGraph = function(data, label, col, nickname, page){
     let graphData;
     let columns = [];
     let b = (page-1)*10;
@@ -30,22 +30,30 @@ let makeBarGraph = function(data, label, col, page){
     if(e>data.length){
         e = data.length;
     }
-    col.forEach(colData => {
-        columns.push({title:colData, labels:[], y:[]});
-    });
+    //sets up columns
+    for(let i=0; i<col.length; i++){
+        let colData = col[i];
+        let preferredData = nickname==null? colData : nickname[i];
+        columns.push({title:colData, labels:[], preferred:preferredData, y:[]});
+    }
+    //adds data into columns
     for(let i=b; i<e; i++){
         for(let j=0; j<columns.length; j++){
-            columns[j].labels.push(data[i][label]);
-            columns[j].y.push(data[i][col[j]]);
+            let cellData = data[i];
+            let colData = col[j];
+            columns[j].labels.push(cellData[label]);
+            columns[j].y.push(cellData[colData]);
         }
     }
+    //creating actual graph
     graphData = 'data:[\n';
     for(let i=0; i<columns.length; i++){
+        let column = columns[i];
         graphData += '{type:"stackedBar",\n';
-        graphData += 'name:"'+ columns[i].title+'",\n';
+        graphData += 'name:"'+ column.preferred+'",\n';
         graphData += 'showInLegend: "true",\ndataPoints: [\n';
-        for(let j=0; j<columns[i].labels.length; j++){
-            graphData += '{ y:'+columns[i].y[j]+', label: "'+columns[i].labels[j]+'" },\n';
+        for(let j=0; j<column.labels.length; j++){
+            graphData += '{ y:'+column.y[j]+', label: "'+column.labels[j]+'" },\n';
         }
         graphData += ']\n';
         graphData += '},\n';
@@ -100,6 +108,8 @@ app.get('/km/:eq/:num/:page', (req, res)=>{
             let graph = makeBarGraph(airlineData, "airline",
                 ["incidents_85_99",  "fatal_accidents_85_99",  "fatalities_85_99",
                 "incidents_00_14",  "fatal_accidents_00_14",  "fatalities_00_14"],
+                ["Incidents (1985-1999)", "Fatal Accidents (1985-1999)", "Fatalities (1985-1999)",
+                "Incidents (2000-2014)", "Fatal Accidents (2000-2014)", "Fatalities (2000-2014)"],
                 page);
             response = data.replace('//$$GRAPH$$', graph);
             response = response.replace('$$PREV$$', prev);
