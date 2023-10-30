@@ -20,3 +20,32 @@ td, th {
 tr:nth-child(even) {
     background-color: #f2f2f2;
 }
+.header {
+    background-color: #0055cc;
+    color: #fff;
+    padding: 1rem;
+    text-align: center;
+}
+body {
+    background-color: #f4f4f4;
+}
+.blurb {
+    padding: 1.5rem;
+    margin: 1.5rem;
+}
+.boxy {
+    background-color: #fff;
+    border-radius: 0.3rem;
+}
+#filter-options{
+    margin-top: 1.2rem;
+    padding: 2rem;
+}
+.filter-columns{
+    background-color: #0055cc;
+    padding: 1%;
+    border-radius: 0.3rem;
+}
+.filter-columns label{
+    color: #fff;
+}

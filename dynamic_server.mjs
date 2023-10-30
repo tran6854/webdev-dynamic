@@ -62,6 +62,31 @@ let makeBarGraph = function(data, label, col, nickname, page){
     return graphData;
 };
 
+app.get('/airline-info', (req, res)=>{
+    let query='SELECT airline From Airlines';
+    db.all(query, (err, rows)=>{
+        if(err){
+            res.status(404).type('html').send("Query not found")
+            console.log(err);
+        }else{
+            let airlineNames = rows;
+            let response;
+            console.log(airlineNames);
+            fs.readFile(path.join(template,"/airline-info.html"), 'utf-8', (err, data)=>{
+                let options = '';
+                airlineNames.forEach(name => {
+                    let urlName = name.airline.replace(' / ', '%2F').replace(' - ', '-');
+                    urlName = urlName.replaceAll(' ', '_').toLowerCase();
+                    options += "makeElement('option', {value:'"+urlName+"', text:'"+name.airline+"'}),\n";
+                    console.log(urlName);
+                });
+                response = data.replace('//$$OPTIONS$$', options);
+                res.status(200).type('html').send(response);
+            });
+        }
+    });
+});
+
 app.get('/km/:eq/:num/:page', (req, res)=>{
     let eq = req.params.eq
     let equality;
