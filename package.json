@@ -3,10 +3,10 @@
     "description": "Dynamic Server",
     "version": "1.0.0",
     "author": {
-        "name": "",
-        "email": ""
+        "name": "John Tran",
+        "email": "tran6854@stthomas.edu"
     },
-    "contributors": [],
+    "contributors": ["Catherine Kieffer", "Brahima Ann"],
     "repository": {},
     "dependencies": {
         "express": "^4.18.2",

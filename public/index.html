@@ -3,98 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Airline Safety Reviews</title>
+    <link rel="stylesheet" href="css/foundation.css">
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <h1>Flights</h1>
-    <p>Choose a filter</p>
-    <input type="radio" id="airline"><label id = "radio-label1" for="airline">Airline</label>
-    <input type="radio" id="ask"><label id = "radio-label2" for="ask">ASK / Week</label>
-    <input type="radio" id="date"><label id = "radio-label3" for="date">Date Range</label>
-    <div id="filter"></div>
+
+<div class="header">
+    <h1>Airline Safety Reviews</h1>
+    <p>Your Trusted Source for Air Travel Safety Information</p>
+</div>
+
+<nav class="top-bar">
+    <div class="top-bar-left">
+        <ul class="menu">
+            <li class="menu-text">Airline Safety Reviews</li>
+        </ul>
+    </div>
+    <div class="top-bar-right">
+        <ul class="menu">
+            <li><a href="#">Home</a></li>
+            <li><a href="/airline-info">Airline Info</a></li>
+            <li><a href="/about-us.html">About Us</a></li>
+        </ul>
+    </div>
+</nav>
+
+<div class="blurb boxy">
+    <h2>Welcome to Airline Safety Reviews</h2>
+    <p>Explore safety data for airlines around the world. Our mission is to provide passengers with valuable information to make informed travel choices.</p>
+    <p>Search for your favorite airlines and read safety reviews from experienced travelers.</p>
+</div>
 
 
+<script src="js/vendor/jquery.js"></script>
+<script src="js/vendor/what-input.js"></script>
+<script src="js/vendor/foundation.js"></script>
+<script type="application/javascript">
+    $(document).foundation();
+</script>
 
-    <script>
-        let radio1 = document.getElementById("radio-label1");
-        let radio2 = document.getElementById("radio-label2");
-        let radio3 = document.getElementById("radio-label3");
-        let radioData1 = document.getElementById("airline");
-        let radioData2 = document.getElementById("ask");
-        let radioData3 = document.getElementById("date");
-
-        let currentInput;
-        
-        function check(){
-            radioData1.checked = false;
-            radioData2.checked = false;
-            radioData3.checked = false;
-            removeChildren(filter);
-        }
-        window.onload = check;
-        radio1.addEventListener('mouseup', check);
-        radio2.addEventListener('mouseup', check);
-        radio3.addEventListener('mouseup', check);
-        radioData1.addEventListener('mouseup', check);
-        radioData2.addEventListener('mouseup', check);
-        radioData3.addEventListener('mouseup', check);
-
-
-        radio2.addEventListener('mouseup', filterAsk);
-        radioData2.addEventListener('mouseup', filterAsk);
-
-        let filter = document.getElementById('filter');
-        function filterAsk(){
-            let form = makeElement('form', {onsubmit:test});
-            let select = makeElement('select', {id: 'EQ'});
-            let eq = makeElement('option', {value:'eq', text:'='});
-            let gt = makeElement('option', {value:'gt', text:'>'});
-            let lt = makeElement('option', {value:'lt', text:'<'});
-            let gte = makeElement('option', {value:'gte', text:'≥'});
-            let lte = makeElement('option', {value:'lte', text:'≤'});
-            let numInput = makeElement('input', {id: 'KM-NUM', type: 'number', min: '0'});
-            let submit = makeElement('input', {type: 'submit', name: 'Search'});
-            currentInput = numInput;
-            link(select, [eq, gt, lt, gte, lte]);
-            link(form, [select, numInput, submit]);
-            filter.appendChild(form);
-        }
-
-        function makeElement(type, attributes){
-            let element = document.createElement(type);
-            let attributesList = Object.keys(attributes);
-            attributesList.forEach(attr => {
-                let val = attributes[attr];
-                element[attr] = val;
-            });
-            return element;
-        }
-
-        function removeChildren(parent){
-            children = parent.children;
-            for(let i=0; i<children.length; i++){
-                parent.removeChild(children[i]);
-            }
-        }
-
-        function link(parent, children){
-            children.forEach(child => {
-                parent.appendChild(child);
-            });
-        }
-
-        function test(){
-            if(currentInput.value == ''){
-                alert('TEXT FIELD CANNOT BE EMPTY');
-                return;
-            }
-            let equality = document.getElementById('EQ').value;
-            let num = document.getElementById('KM-NUM').value;
-            window.location.replace('/km/'+equality+"/"+num+"/1");
-            return false;
-        }
-
-    </script>
 </body>
 </html>

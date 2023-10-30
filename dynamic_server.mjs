@@ -13,6 +13,9 @@ const template = path.join(__dirname, 'templates');
 
 let app = express();
 app.use(express.static(root));
+app.use("/about-us", express.static(path.join(root, '/about-us.html')));
+app.use("/leadership", express.static(path.join(root, '/leadership.html')));
+
 
 const db = new sqlite3.Database(path.join(__dirname, 'airline.sqlite3'), sqlite3.OPEN_READONLY, (err)=>{
     if(err){
@@ -22,11 +25,11 @@ const db = new sqlite3.Database(path.join(__dirname, 'airline.sqlite3'), sqlite3
     }
 });
 
-let makeBarGraph = function(data, label, col, nickname, page){
+let makeBarGraph = function(data, type, label, col, nickname, page, pageInc){
     let graphData;
     let columns = [];
-    let b = (page-1)*10;
-    let e = b+10;
+    let b = (page-1)*pageInc;
+    let e = b+pageInc;
     if(e>data.length){
         e = data.length;
     }
@@ -49,7 +52,7 @@ let makeBarGraph = function(data, label, col, nickname, page){
     graphData = 'data:[\n';
     for(let i=0; i<columns.length; i++){
         let column = columns[i];
-        graphData += '{type:"stackedBar",\n';
+        graphData += '{type:"'+type+'",\n';
         graphData += 'name:"'+ column.preferred+'",\n';
         graphData += 'showInLegend: "true",\ndataPoints: [\n';
         for(let j=0; j<column.labels.length; j++){
@@ -71,7 +74,6 @@ app.get('/airline-info', (req, res)=>{
         }else{
             let airlineNames = rows;
             let response;
-            console.log(airlineNames);
             fs.readFile(path.join(template,"/airline-info.html"), 'utf-8', (err, data)=>{
                 let options = '';
                 airlineNames.forEach(name => {
@@ -123,19 +125,20 @@ app.get('/km/:eq/:num/:page', (req, res)=>{
     let send = function(airlineData){
         fs.readFile(path.join(template,"/temp.html"), 'utf-8', (err, data)=>{
             let response;
-            let begin = (page-1)*10;
+            let pageInc = 10;
+            let begin = (page-1)*pageInc;
             let prev = page==1?'<span style="color:gray">Prev</span>':'<a href="/km/'+eq+'/'+num+'/'+(parseInt(page)-1)+'">Prev</a>';
             let next = airlineData.length-10<=begin?'<span style="color:gray">Next</span>':'<a href="/km/'+eq+'/'+num+'/'+(parseInt(page)+1)+'">Next</a>';
             if(page<=0||begin >= airlineData.length){
                 res.status(404).type('html').send("Could not find");
                 return;
             }
-            let graph = makeBarGraph(airlineData, "airline",
+            let graph = makeBarGraph(airlineData, "stackedBar", "airline",
                 ["incidents_85_99",  "fatal_accidents_85_99",  "fatalities_85_99",
                 "incidents_00_14",  "fatal_accidents_00_14",  "fatalities_00_14"],
                 ["Incidents (1985-1999)", "Fatal Accidents (1985-1999)", "Fatalities (1985-1999)",
                 "Incidents (2000-2014)", "Fatal Accidents (2000-2014)", "Fatalities (2000-2014)"],
-                page);
+                page, pageInc);
             response = data.replace('//$$GRAPH$$', graph);
             response = response.replace('$$PREV$$', prev);
             response = response.replace('$$NEXT$$', next);
@@ -194,6 +197,22 @@ app.get('/km/:eq/:num/:page', (req, res)=>{
 });
 
 //  app.get('/km/:eq/:num', (req, res)=>{
+
+/*
+let response;
+            let pageInc = 1;
+            let begin = (page-1)*pageInc;
+            let prev = page==1?'<span style="color:gray">Prev</span>':'<a href="/km/'+eq+'/'+num+'/'+(parseInt(page)-1)+'">Prev</a>';
+            let next = airlineData.length-10<=begin?'<span style="color:gray">Next</span>':'<a href="/km/'+eq+'/'+num+'/'+(parseInt(page)+1)+'">Next</a>';
+
+let graph = makeBarGraph(airlineData, "column", "airline",
+            ["incidents_85_99",  "fatal_accidents_85_99",  "fatalities_85_99",
+            "incidents_00_14",  "fatal_accidents_00_14",  "fatalities_00_14"],
+            ["Incidents (1985-1999)", "Fatal Accidents (1985-1999)", "Fatalities (1985-1999)",
+            "Incidents (2000-2014)", "Fatal Accidents (2000-2014)", "Fatalities (2000-2014)"],
+            page, pageInc);
+*/
+
 
 app.get('/air/:airline', (req, res)=>{
 //     let equality = req.params.eq;
