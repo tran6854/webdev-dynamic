@@ -77,10 +77,10 @@ app.get('/airline-info', (req, res)=>{
             fs.readFile(path.join(template,"/airline-info.html"), 'utf-8', (err, data)=>{
                 let options = '';
                 airlineNames.forEach(name => {
-                    let urlName = name.airline.replace(' / ', '%2F').replace(' - ', '-');
-                    urlName = urlName.replaceAll(' ', '_').toLowerCase();
+                    let urlName = name.airline.replace(' / ', '%20%2F%20').replace(' - ', '%20-%20');
+                    urlName = urlName.replaceAll(' ', '%20');
                     options += "makeElement('option', {value:'"+urlName+"', text:'"+name.airline+"'}),\n";
-                    console.log(urlName);
+                    // console.log(urlName);
                 });
                 response = data.replace('//$$OPTIONS$$', options);
                 res.status(200).type('html').send(response);
@@ -218,7 +218,6 @@ app.get('/air/:airline', (req, res)=>{
 //     let equality = req.params.eq;
 //     let num = req.params.num;
     let airline = req.params.airline;
-    console.log(airline);
     let query='SELECT * From Airlines WHERE airline=?';
     db.all(query, [airline], (err, rows)=>{
         if(err){
@@ -233,14 +232,13 @@ app.get('/air/:airline', (req, res)=>{
     let send = function(airlineData){
         fs.readFile(path.join(template,"/temp.html"), 'utf-8', (err, data)=>{
             let response;
-            let table = makeTable(
-                ["Airline", "ASK", "i89", "fa89", "f89", "i01", "fa01", "f01"],
-                airlineData,
-                ["airline",  "avail_seat_km_per_week",
-                "incidents_85_99",  "fatal_accidents_85_99",  "fatalities_85_99",
-                "incidents_00_14",  "fatal_accidents_00_14",  "fatalities_00_14"]
-            );
-            response = data.replace('$$DATA$$', table);
+            let graph = makeBarGraph(airlineData, "column", "airline",
+            ["incidents_85_99",  "fatal_accidents_85_99",  "fatalities_85_99",
+            "incidents_00_14",  "fatal_accidents_00_14",  "fatalities_00_14"],
+            ["Incidents (1985-1999)", "Fatal Accidents (1985-1999)", "Fatalities (1985-1999)",
+            "Incidents (2000-2014)", "Fatal Accidents (2000-2014)", "Fatalities (2000-2014)"],
+            1, 10);
+            response = data.replace('//$$GRAPH$$', graph);
             response = response.replace('$$TITLE$$', "Airline Data Filtered By Airline: "+airline);
             res.status(200).type('html').send(response);
         });
