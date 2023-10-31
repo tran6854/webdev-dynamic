@@ -1,44 +1,22 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>TEMP</title>
-    <link rel="stylesheet" href="/css/styles.css">
-	<script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
-</head>
-<body>
-	<a href="/">Home</a>
-	<div id="chartContainer" style="height: 370px; width: 100%;">test</div>
-	<div>$$PREV$$  $$NEXT$$</div>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TEMP</title> 
+    <script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
 
-	<script>
-	window.onload = function () {
-		var chart = new CanvasJS.Chart("chartContainer", {
-			animationEnabled: true,
-			title:{
-				text: "$$TITLE$$"
-			},
-			toolTip: {
-				shared: true
-			},
-			legend:{
-				cursor: "pointer",
-				itemclick: toggleDataSeries
-			},
-			//$$GRAPH$$
-		});
-		chart.render();
-		function toggleDataSeries(e) {
-			if(typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
-				e.dataSeries.visible = false;
-			}
-			else {
-				e.dataSeries.visible = true;
-			}
-			chart.render();
-		}
-	}
-	</script>
-</body>
+  </head>
+  <body>
+<h2>$$TITLE$$</h2>
+    <div id="chartContainer" style="height: 370px; width: 100%;">
+    <script>
+      window.onload = function () {
+            var chart = new CanvasJS.Chart("chartContainer", $$GRAPH$$);
+            chart.render();
+        }
+      </script>
+    </div>
+	 $$DATA$$
+  </body>
 </html>
