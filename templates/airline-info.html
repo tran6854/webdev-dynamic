@@ -99,6 +99,21 @@
             tipClicked = true;
         });
 
+
+
+
+//         let select = makeElement('select', { id: 'airline-names' });
+
+// // Example list of airline names
+// let airlineNames = ['Delta', 'United', 'American', 'Southwest'];
+
+// // Loop through the list of airline names and create an option element for each
+// for (let i = 0; i < airlineNames.length; i++) {
+//     let option = makeElement('option', { value: airlineNames[i], text: airlineNames[i], id: 'airline-' + i });
+//     select.appendChild(option);
+// }
+
+
         //Airline popup buttons
         let airlineFilter = document.getElementById('airline-filter');
         function filterAirline(){
@@ -106,6 +121,12 @@
             let select = makeElement('select', {id: 'airline-names'});
             let hint = makeElement('option', {value:'', text:'Select an Airline', disabled:true, selected: true});
             let submit = makeElement('input', {type: 'submit'});
+
+
+            // for (let i = 0; i < airlineNames.length; i++) {
+            //     let option = makeElement('option', { value: airlineNames[i], text: airlineNames[i], id: 'airline-option-' + i });
+            //     link(select, [option]);
+            // }
             
             link(select, [hint,
                 //$$OPTIONS$$
@@ -188,10 +209,6 @@
 
         function sumbitAirline(){
             let submitVal = document.getElementById('airline-names').value;
-            // let firstLetter = submitVal[0].toUpperCase();
-            // let otherLetters = submitVal[1:];
-            // submitVal = firstLetter+''+submitVal[1:10];
-            // console.log(submitVal);
             if(submitVal == ''){
                 alert('PLEASE SELECT AN AIRLINE');
                 return;

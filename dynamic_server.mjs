@@ -77,8 +77,8 @@ app.get('/airline-info', (req, res)=>{
             fs.readFile(path.join(template,"/airline-info.html"), 'utf-8', (err, data)=>{
                 let options = '';
                 airlineNames.forEach(name => {
-                    let urlName = name.airline.replace(' / ', '%20%2F%20').replace(' - ', '-');
-                    urlName = urlName.replaceAll(' ', '%2D');
+                    let urlName = name.airline.replace(' / ', '%20-%20');
+                    urlName = urlName.replaceAll(' ', '%20');
                     options += "makeElement('option', {value:'"+urlName+"', text:'"+name.airline+"'}),\n";
                     // console.log(urlName);
                 });
@@ -254,11 +254,13 @@ app.get('/airline/:airline/:page', (req, res)=>{
             console.log(airline_stuff.rowid)
             let airline_id = airline_stuff.rowid;
             let next_airline = airlineData[airline_id].airline;
-            let previous_airline = airlineData[airline_id-2].airline;
+            let previous_airline = 0;
+            if ((airline_id - 2) >= 0) {
+                previous_airline = airlineData[airline_id-2].airline;
+            }
             console.log(next_airline);
             console.log(previous_airline);
-            // let value = airlineData.get("airline", airline);
-            // console.log(value);
+
             let prev = page==1?'<span style="color:gray">Prev</span>':'<a href="/airline/'+next_airline+'/'+(parseInt(page)-1)+'">Prev</a>';
             let next = airlineData.length-pageInc<=begin?'<span style="color:gray">Next</span>':'<a href="/airline/'+previous_airline+'/'+(parseInt(page)+1)+'">Next</a>';
             if(page<=0||begin >= airlineData.length){
