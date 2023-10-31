@@ -13,6 +13,9 @@ const template = path.join(__dirname, 'templates');
 
 let app = express();
 app.use(express.static(root));
+app.use("/about-us", express.static(path.join(root, '/about-us.html')));
+app.use("/leadership", express.static(path.join(root, '/leadership.html')));
+
 
 const db = new sqlite3.Database(path.join(__dirname, 'airline.sqlite3'), sqlite3.OPEN_READONLY, (err)=>{
     if(err){
@@ -22,23 +25,89 @@ const db = new sqlite3.Database(path.join(__dirname, 'airline.sqlite3'), sqlite3
     }
 });
 
-app.get('/km/:eq/:num', (req, res)=>{
-    let equality = req.params.eq;
+let makeBarGraph = function(data, type, label, col, nickname, page, pageInc){
+    let graphData;
+    let columns = [];
+    let b = (page-1)*pageInc;
+    let e = b+pageInc;
+    if(e>data.length){
+        e = data.length;
+    }
+    //sets up columns
+    for(let i=0; i<col.length; i++){
+        let colData = col[i];
+        let preferredData = nickname==null? colData : nickname[i];
+        columns.push({title:colData, labels:[], preferred:preferredData, y:[]});
+    }
+    //adds data into columns
+    for(let i=b; i<e; i++){
+        for(let j=0; j<columns.length; j++){
+            let cellData = data[i];
+            let colData = col[j];
+            columns[j].labels.push(cellData[label]);
+            columns[j].y.push(cellData[colData]);
+        }
+    }
+    //creating actual graph
+    graphData = 'data:[\n';
+    for(let i=0; i<columns.length; i++){
+        let column = columns[i];
+        graphData += '{type:"'+type+'",\n';
+        graphData += 'name:"'+ column.preferred+'",\n';
+        graphData += 'showInLegend: "true",\ndataPoints: [\n';
+        for(let j=0; j<column.labels.length; j++){
+            graphData += '{ y:'+column.y[j]+', label: "'+column.labels[j]+'" },\n';
+        }
+        graphData += ']\n';
+        graphData += '},\n';
+    }
+    graphData += ']';
+    return graphData;
+};
+
+app.get('/airline-info', (req, res)=>{
+    let query='SELECT airline From Airlines';
+    db.all(query, (err, rows)=>{
+        if(err){
+            res.status(404).type('html').send("Query not found")
+            console.log(err);
+        }else{
+            let airlineNames = rows;
+            let response;
+            fs.readFile(path.join(template,"/airline-info.html"), 'utf-8', (err, data)=>{
+                let options = '';
+                airlineNames.forEach(name => {
+                    let urlName = name.airline.replace(' / ', '%20%2F%20').replace(' - ', '-');
+                    urlName = urlName.replaceAll(' ', '%2D');
+                    options += "makeElement('option', {value:'"+urlName+"', text:'"+name.airline+"'}),\n";
+                    // console.log(urlName);
+                });
+                response = data.replace('//$$OPTIONS$$', options);
+                res.status(200).type('html').send(response);
+            });
+        }
+    });
+});
+
+app.get('/km/:eq/:num/:page', (req, res)=>{
+    let eq = req.params.eq
+    let equality;
     let num = req.params.num;
+    let page = req.params.page;
     let symb = '';
-    if(equality == 'eq'){
+    if(eq == 'eq'){
         equality = '=';
         symb = '=';
-    }else if(equality == 'lt'){
+    }else if(eq == 'lt'){
         equality = '<';
         symb = '<';
-    }else if(equality == 'gt'){
+    }else if(eq == 'gt'){
         equality = '>';
         symb = '>';
-    }else if(equality == 'lte'){
+    }else if(eq == 'lte'){
         equality = '<=';
         symb = '≤';
-    }else if(equality == 'gte'){
+    }else if(eq == 'gte'){
         equality = '>=';
         symb = '≥';
     }
@@ -56,14 +125,23 @@ app.get('/km/:eq/:num', (req, res)=>{
     let send = function(airlineData){
         fs.readFile(path.join(template,"/temp.html"), 'utf-8', (err, data)=>{
             let response;
-            let table = makeTable(
-                ["Airline", "ASK", "i89", "fa89", "f89", "i01", "fa01", "f01"],
-                airlineData,
-                ["airline",  "avail_seat_km_per_week",
-                "incidents_85_99",  "fatal_accidents_85_99",  "fatalities_85_99",
-                "incidents_00_14",  "fatal_accidents_00_14",  "fatalities_00_14"]
-            );
-            response = data.replace('$$DATA$$', table);
+            let pageInc = 10;
+            let begin = (page-1)*pageInc;
+            let prev = page==1?'<span style="color:gray">Prev</span>':'<a href="/km/'+eq+'/'+num+'/'+(parseInt(page)-1)+'">Prev</a>';
+            let next = airlineData.length-10<=begin?'<span style="color:gray">Next</span>':'<a href="/km/'+eq+'/'+num+'/'+(parseInt(page)+1)+'">Next</a>';
+            if(page<=0||begin >= airlineData.length){
+                res.status(404).type('html').send("Could not find");
+                return;
+            }
+            let graph = makeBarGraph(airlineData, "stackedBar", "airline",
+                ["incidents_85_99",  "fatal_accidents_85_99",  "fatalities_85_99",
+                "incidents_00_14",  "fatal_accidents_00_14",  "fatalities_00_14"],
+                ["Incidents (1985-1999)", "Fatal Accidents (1985-1999)", "Fatalities (1985-1999)",
+                "Incidents (2000-2014)", "Fatal Accidents (2000-2014)", "Fatalities (2000-2014)"],
+                page, pageInc);
+            response = data.replace('//$$GRAPH$$', graph);
+            response = response.replace('$$PREV$$', prev);
+            response = response.replace('$$NEXT$$', next);
             response = response.replace('$$TITLE$$', "Airline Data Filtered By Available Seat km/week: "+symb+num);
             res.status(200).type('html').send(response);
         });
@@ -118,37 +196,101 @@ app.get('/km/:eq/:num', (req, res)=>{
 
 });
 
-//  app.get('/km/:eq/:num', (req, res)=>{
 
-app.get('/air/:airline', (req, res)=>{
-//     let equality = req.params.eq;
-//     let num = req.params.num;
+app.get('/airline/:airline/:page', (req, res)=>{
     let airline = req.params.airline;
-    console.log(airline);
-    let query='SELECT * From Airlines WHERE airline=?';
-    db.all(query, [airline], (err, rows)=>{
+    // console.log(airline.rowid);
+
+    let db_query = "SELECT rowid, * From Airlines"
+    db.all(db_query, (err, rows)=>{
         if(err){
             res.status(404).type('html').send("Query not found")
             console.log(err);
         }else{
-            console.log(rows);
+            // console.log(rows);
             send(rows);
         }
     });
+    console.log(airline);
+    // airline = airline.replace('-', ' ');
+    airline = airline.replaceAll('_', ' ');
+    // console.log(airline);
+
+    // let big_query = 'SELECT * From Airlines';
+    // db.all(big_query, (err, allRows) => {
+    //     if(err){
+    //         res.status(404).type('html').send("Query not found")
+    //         console.log(err);
+    //     }else{
+    //         // console.log(rows);
+    //         send(allRows);
+    //     }
+    // });
+
+    // let query = 'SELECT * From Airlines WHERE airline=?';
+    // db.all(query, [airline], (err, rows)=>{
+    //     if(err){
+    //         res.status(404).type('html').send("Query not found")
+    //         console.log(err);
+    //     }else{
+    //         // console.log(rows);
+    //         send(rows);
+    //     }
+    // });
+    //0-55 dictionary entry
+    // just call the next number
+    // airlinedata[0]
+    // pageInc-1
 
     let send = function(airlineData){
         fs.readFile(path.join(template,"/temp.html"), 'utf-8', (err, data)=>{
             let response;
-            let table = makeTable(
-                ["Airline", "ASK", "i89", "fa89", "f89", "i01", "fa01", "f01"],
-                airlineData,
-                ["airline",  "avail_seat_km_per_week",
-                "incidents_85_99",  "fatal_accidents_85_99",  "fatalities_85_99",
-                "incidents_00_14",  "fatal_accidents_00_14",  "fatalities_00_14"]
-            );
-            response = data.replace('$$DATA$$', table);
+            let page = req.params.page;
+            let pageInc = 1;
+            let begin = (page-1)*pageInc;
+
+            let airline_stuff = airlineData.find(entry => entry.airline === airline);
+            console.log(airline_stuff)
+            console.log(airline_stuff.rowid)
+            let airline_id = airline_stuff.rowid;
+            let next_airline = airlineData[airline_id].airline;
+            let previous_airline = airlineData[airline_id-2].airline;
+            console.log(next_airline);
+            console.log(previous_airline);
+            // let value = airlineData.get("airline", airline);
+            // console.log(value);
+            let prev = page==1?'<span style="color:gray">Prev</span>':'<a href="/airline/'+next_airline+'/'+(parseInt(page)-1)+'">Prev</a>';
+            let next = airlineData.length-pageInc<=begin?'<span style="color:gray">Next</span>':'<a href="/airline/'+previous_airline+'/'+(parseInt(page)+1)+'">Next</a>';
+            if(page<=0||begin >= airlineData.length){
+                res.status(404).type('html').send("Could not find");
+                return;
+            }
+
+            let graph = makeBarGraph(airlineData, "column", "airline",
+            ["incidents_85_99",  "fatal_accidents_85_99",  "fatalities_85_99",
+            "incidents_00_14",  "fatal_accidents_00_14",  "fatalities_00_14"],
+            ["Incidents (1985-1999)", "Fatal Accidents (1985-1999)", "Fatalities (1985-1999)",
+            "Incidents (2000-2014)", "Fatal Accidents (2000-2014)", "Fatalities (2000-2014)"],
+            page, pageInc);
+
+            response = data.replace('//$$GRAPH$$', graph);
+            response = response.replace('$$PREV$$', prev);
+            response = response.replace('$$NEXT$$', next);
             response = response.replace('$$TITLE$$', "Airline Data Filtered By Airline: "+airline);
             res.status(200).type('html').send(response);
+
+
+            // let table = makeTable(
+            //     ["Airline", "ASK", "i89", "fa89", "f89", "i01", "fa01", "f01"],
+            //     airlineData,
+            //     ["airline",  "avail_seat_km_per_week",
+            //     "incidents_85_99",  "fatal_accidents_85_99",  "fatalities_85_99",
+            //     "incidents_00_14",  "fatal_accidents_00_14",  "fatalities_00_14"]
+            // );
+            // response = data.replace('$$DATA$$', table);
+
+            // response = response.replace('$$TITLE$$', "Airline Data Filtered By Airline: "+airline);
+            // res.status(200).type('html').send(response);
         });
     };
 

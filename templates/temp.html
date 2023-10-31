@@ -4,27 +4,41 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>TEMP</title>
-	<style>
-		table {
-			border-collapse: collapse;
-			width: 100%;
-		}
-
-		td, th {
-			padding: 8px 12px;
-			text-align: left;
-			border: 1px solid #ccc;
-		}
-
-		tr:nth-child(even) {
-			background-color: #f2f2f2;
-		}
-	</style>
+    <link rel="stylesheet" href="/css/styles.css">
+	<script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
 </head>
 <body>
-	<h2>$$TITLE$$</h2>
-	
-	$$DATA$$
-	
+	<a href="/">Home</a>
+	<div id="chartContainer" style="height: 370px; width: 100%;">test</div>
+	<div>$$PREV$$  $$NEXT$$</div>
+
+	<script>
+	window.onload = function () {
+		var chart = new CanvasJS.Chart("chartContainer", {
+			animationEnabled: true,
+			title:{
+				text: "$$TITLE$$"
+			},
+			toolTip: {
+				shared: true
+			},
+			legend:{
+				cursor: "pointer",
+				itemclick: toggleDataSeries
+			},
+			//$$GRAPH$$
+		});
+		chart.render();
+		function toggleDataSeries(e) {
+			if(typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+				e.dataSeries.visible = false;
+			}
+			else {
+				e.dataSeries.visible = true;
+			}
+			chart.render();
+		}
+	}
+	</script>
 </body>
 </html>
