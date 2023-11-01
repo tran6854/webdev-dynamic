@@ -64,8 +64,6 @@
         let radioData1 = document.getElementById("airline");
         let radioData2 = document.getElementById("ask");
         let radioData3 = document.getElementById("date");
-
-        let currentInput;
         
         function check(){
             radioData1.checked = false;
@@ -134,7 +132,6 @@
             let lte = makeElement('option', {value:'lte', text:'≤'});
             let numInput = makeElement('input', {id: 'km-num', type: 'number', min: '0'});
             let submit = makeElement('input', {type: 'submit'});
-            currentInput = numInput;
             link(select, [eq, gt, lt, gte, lte]);
             askSelect.appendChild(select);
             askInput.appendChild(numInput);

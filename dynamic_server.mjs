@@ -25,6 +25,7 @@ const db = new sqlite3.Database(path.join(__dirname, 'airline.sqlite3'), sqlite3
     }
 });
 
+
 let makeBarGraph = function(data, type, label, col, nickname, addKM, page, pageInc){
     let graphData;
     let columns = [];
@@ -37,6 +38,7 @@ let makeBarGraph = function(data, type, label, col, nickname, addKM, page, pageI
     for(let i=0; i<col.length; i++){
         let colData = col[i];
         let preferredData = nickname==null? colData : nickname[i];
+
         columns.push({title:colData, labels:[], preferred:preferredData, y:[], km:[]});
     }
     //adds data into columns
@@ -53,6 +55,7 @@ let makeBarGraph = function(data, type, label, col, nickname, addKM, page, pageI
     }
     //creating actual graph
     graphData = 'data:[\n';
+  
     // graphData += '{toolTipContent: "test",\n';
     let q='\'\\"\'';
     for(let i=0; i<columns.length; i++){
