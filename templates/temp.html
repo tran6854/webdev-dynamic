@@ -4,27 +4,65 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>TEMP</title>
-	<style>
-		table {
-			border-collapse: collapse;
-			width: 100%;
-		}
-
-		td, th {
-			padding: 8px 12px;
-			text-align: left;
-			border: 1px solid #ccc;
-		}
-
-		tr:nth-child(even) {
-			background-color: #f2f2f2;
-		}
-	</style>
+    <link rel="stylesheet" href="/css/foundation.css">
+    <link rel="stylesheet" href="/css/styles.css">
+	<script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
 </head>
 <body>
-	<h2>$$TITLE$$</h2>
+	<div class="header">
+		<p>Your Trusted Source for Air Travel Safety Information</p>
+	</div>
 	
-	$$DATA$$
-	
+	<nav class="top-bar">
+		<div class="top-bar-left">
+			<ul class="menu">
+				<li class="menu-text">Airline Safety Reviews</li>
+			</ul>
+		</div>
+		<div class="top-bar-right">
+			<ul class="menu test">
+				<li><a href="/">Home</a></li>
+				<li><a href="/airline-info">Airline Info</a></li>
+				<li><a href="/about-us">About Us</a></li>
+			</ul>
+		</div>
+	</nav>
+	<div id="chartContainer" style="height: 370px; width: 100%;">test</div>
+	<div class="button-container">$$PREV$$ $$NEXT$$</div>
+
+	<script>
+	window.onload = function () {
+		var chart = new CanvasJS.Chart("chartContainer", {
+			animationEnabled: true,
+			title:{
+				text: "$$TITLE$$"
+			},
+			toolTip: {
+				shared: true,
+			},
+			legend:{
+				cursor: "pointer",
+				itemclick: toggleDataSeries
+			},
+			//$$GRAPH$$
+		});
+		chart.render();
+		function toggleDataSeries(e) {
+			if(typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+				e.dataSeries.visible = false;
+			}
+			else {
+				e.dataSeries.visible = true;
+			}
+			chart.render();
+		}
+	}
+	</script>
+	<script src="/js/vendor/jquery.js"></script>
+	<script src="/js/vendor/what-input.js"></script>
+	<script src="/js/vendor/foundation.js"></script>
+	<script type="application/javascript">
+		$(document).foundation();
+	</script>
 </body>
 </html>
