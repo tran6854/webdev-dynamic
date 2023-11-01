@@ -64,8 +64,6 @@
         let radioData1 = document.getElementById("airline");
         let radioData2 = document.getElementById("ask");
         let radioData3 = document.getElementById("date");
-
-        let currentInput;
         
         function check(){
             radioData1.checked = false;
@@ -99,21 +97,6 @@
             tipClicked = true;
         });
 
-
-
-
-//         let select = makeElement('select', { id: 'airline-names' });
-
-// // Example list of airline names
-// let airlineNames = ['Delta', 'United', 'American', 'Southwest'];
-
-// // Loop through the list of airline names and create an option element for each
-// for (let i = 0; i < airlineNames.length; i++) {
-//     let option = makeElement('option', { value: airlineNames[i], text: airlineNames[i], id: 'airline-' + i });
-//     select.appendChild(option);
-// }
-
-
         //Airline popup buttons
         let airlineFilter = document.getElementById('airline-filter');
         function filterAirline(){
@@ -121,12 +104,6 @@
             let select = makeElement('select', {id: 'airline-names'});
             let hint = makeElement('option', {value:'', text:'Select an Airline', disabled:true, selected: true});
             let submit = makeElement('input', {type: 'submit'});
-
-
-            // for (let i = 0; i < airlineNames.length; i++) {
-            //     let option = makeElement('option', { value: airlineNames[i], text: airlineNames[i], id: 'airline-option-' + i });
-            //     link(select, [option]);
-            // }
             
             link(select, [hint,
                 //$$OPTIONS$$
@@ -155,7 +132,6 @@
             let lte = makeElement('option', {value:'lte', text:'≤'});
             let numInput = makeElement('input', {id: 'km-num', type: 'number', min: '0'});
             let submit = makeElement('input', {type: 'submit'});
-            currentInput = numInput;
             link(select, [eq, gt, lt, gte, lte]);
             askSelect.appendChild(select);
             askInput.appendChild(numInput);
@@ -170,8 +146,8 @@
             let form = makeElement('form', {onsubmit:sumbitDate});
             let select = makeElement('select', {id: 'date-range'});
             let hint = makeElement('option', {value:'', text:'Select a Date Range', disabled:true, selected: true});
-            let y8599 = makeElement('option', {value:'85_99', text:'1985-1999'});
-            let y0014 = makeElement('option', {value:'00_14', text:'2000-2014'});
+            let y8599 = makeElement('option', {value:'1985-1999', text:'1985-1999'});
+            let y0014 = makeElement('option', {value:'2000-2014', text:'2000-2014'});
             let submit = makeElement('input', {type: 'submit'});
             
             link(select, [hint, y8599, y0014]);
@@ -232,14 +208,14 @@
                 alert('PLEASE SELECT A DATE');
                 return;
             }
-            // window.location.replace('https://google.com');
+            window.location.replace('/date/'+submitVal+'/1');
             return false;
         }
 
     </script>
-    <script src="js/vendor/jquery.js"></script>
-    <script src="js/vendor/what-input.js"></script>
-    <script src="js/vendor/foundation.js"></script>
+    <script src="/js/vendor/jquery.js"></script>
+    <script src="/js/vendor/what-input.js"></script>
+    <script src="/js/vendor/foundation.js"></script>
     <script type="application/javascript">
         $(document).foundation();
     </script>
