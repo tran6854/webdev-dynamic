@@ -1,5 +1,5 @@
 body {
-    background-color: rgb(32, 63, 106)
+    background-color: #284d81;
 }
 .header {
     background-color: #0055cc;
@@ -44,7 +44,7 @@ img{
 .shadowed-block {
     padding: 1rem;
     background-color: white;
-    border-radius: 10px;
+    border-radius: 10px; /*remember to convert to rems*/
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.3);
     margin: 0 auto; /* Center the block horizontally */
 }
@@ -53,4 +53,48 @@ img{
     width: 20rem;
     border-radius: 50%; /* Apply a circular clipping mask */
     object-fit: cover; /* Maintain the aspect ratio and cover the container */
+}
+
+.enabled-button {
+    user-select: none;
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #0055cc; /* Change this to your desired button color */
+    color: #ffffff; /* Text color */
+    text-align: center;
+    text-decoration: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    font-size: 16px;
+    margin-right: 0.25rem;
+}
+
+/* Hover effect */
+.enabled-button:hover {
+    background-color: #006aff; /* Change this to a slightly darker shade */
+    color: #fff; /* Text color on hover */
+}
+
+/* Example: Styling a disabled button */
+.disabled-button {
+    user-select: none;
+    cursor: not-allowed;
+    display: inline-block;
+    padding: 10px 20px;
+    border-color: #ccc; /* Disabled button border color */
+    background-color: #ccc; /* Disabled button color */
+    color: #666; /* Text color for disabled button */
+    text-align: center;
+    text-decoration: none;
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    font-size: 16px;
+    margin-right: 0.25rem;
+}
+
+.button-container{
+    margin-left: 0.5rem;
+    margin-top: 0.5rem;
 }

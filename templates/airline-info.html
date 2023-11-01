@@ -149,8 +149,8 @@
             let form = makeElement('form', {onsubmit:sumbitDate});
             let select = makeElement('select', {id: 'date-range'});
             let hint = makeElement('option', {value:'', text:'Select a Date Range', disabled:true, selected: true});
-            let y8599 = makeElement('option', {value:'85_99', text:'1985-1999'});
-            let y0014 = makeElement('option', {value:'00_14', text:'2000-2014'});
+            let y8599 = makeElement('option', {value:'1985-1999', text:'1985-1999'});
+            let y0014 = makeElement('option', {value:'2000-2014', text:'2000-2014'});
             let submit = makeElement('input', {type: 'submit'});
             
             link(select, [hint, y8599, y0014]);
@@ -192,7 +192,7 @@
                 alert('PLEASE SELECT AN AIRLINE');
                 return;
             }
-            window.location.replace('/air/'+submitVal);
+            window.location.replace('/airline/'+submitVal);
             return false;
         }
         function sumbitASK(){
@@ -211,14 +211,14 @@
                 alert('PLEASE SELECT A DATE');
                 return;
             }
-            // window.location.replace('https://google.com');
+            window.location.replace('/date/'+submitVal+'/1');
             return false;
         }
 
     </script>
-    <script src="js/vendor/jquery.js"></script>
-    <script src="js/vendor/what-input.js"></script>
-    <script src="js/vendor/foundation.js"></script>
+    <script src="/js/vendor/jquery.js"></script>
+    <script src="/js/vendor/what-input.js"></script>
+    <script src="/js/vendor/foundation.js"></script>
     <script type="application/javascript">
         $(document).foundation();
     </script>
