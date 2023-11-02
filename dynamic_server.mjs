@@ -26,7 +26,7 @@ const db = new sqlite3.Database(path.join(__dirname, 'airline.sqlite3'), sqlite3
 });
 
 
-let makeBarGraph = function(data, type, label, col, nickname, addKM, page, pageInc){
+function makeBarGraph (data, type, label, col, nickname, addKM, page, pageInc){
     let graphData;
     let columns = [];
     let b = (page-1)*pageInc;
@@ -79,7 +79,7 @@ let makeBarGraph = function(data, type, label, col, nickname, addKM, page, pageI
     return graphData;
 };
 
-let numFormat = function(num, style){
+function numFormat(num, style){
     let i = parseInt(num);
     num = i.toLocaleString('en-US');
     if(style != 'short'){
@@ -95,12 +95,22 @@ let numFormat = function(num, style){
     return num;
 };
 
+function sendError(res, msg){
+    let defaultMsg = 'We Couldnt Find the Page You Were Looking For';
+    msg = msg==null?defaultMsg:msg;
+    fs.readFile(path.join(template,"/page-not-found.html"), 'utf-8', (err, data)=>{
+        let response;
+        response = data.replace('$$ERROR$$', msg);
+        res.status(404).type('html').send(response);
+        return;
+    });
+};
+
 app.get('/airline-info', (req, res)=>{
     let query='SELECT airline From Airlines';
     db.all(query, (err, rows)=>{
         if(err){
-            res.status(404).type('html').send("Query not found")
-            console.log(err);
+            sendError(res, "Query Not Found");
         }else{
             let airlineNames = rows;
             let response;
@@ -124,6 +134,10 @@ app.get('/km/:eq/:num/:page', (req, res)=>{
     let num = req.params.num;
     let page = req.params.page;
     let symb = '';
+    if(isNaN(page)){
+        sendError(res, null);
+        return;
+    }
     if(eq == 'eq'){
         equality = '=';
         symb = '=';
@@ -144,8 +158,8 @@ app.get('/km/:eq/:num/:page', (req, res)=>{
     let query='SELECT * From Airlines WHERE avail_seat_km_per_week '+equality+' ?';
     db.all(query, [num], (err, rows)=>{
         if(err){
-            res.status(404).type('html').send("Query not found")
-            console.log(err);
+            // res.status(404).type('html').send("Query Not Found")
+            sendError(res, 'Query Not Found');
         }else{
             send(rows);
         }
@@ -161,7 +175,8 @@ app.get('/km/:eq/:num/:page', (req, res)=>{
             let next = airlineData.length - pageInc <= begin?'<span class = "disabled-button">Next</span>':
                 '<a href="/km/'+eq+'/'+num+'/'+(parseInt(page)+1)+'"><span class="enabled-button">Next</span></a>';
             if(page<=0||begin >= airlineData.length){
-                res.status(404).type('html').send("Could not find");
+                // res.status(404).type('html').send("Could not find");
+                sendError(res, null);
                 return;
             }
             let graph = makeBarGraph(airlineData, "stackedBar", "airline",
@@ -180,11 +195,15 @@ app.get('/km/:eq/:num/:page', (req, res)=>{
 });
 
 app.get('/airline/:page', (req, res)=>{
+    let page = req.params.page;
+    if(isNaN(page)){
+        sendError(res, null);
+        return;
+    }
     let db_query = "SELECT * From Airlines"
     db.all(db_query, (err, rows)=>{
         if(err){
-            res.status(404).type('html').send("Query not found")
-            console.log(err);
+            sendError(res, 'Query Not Found');
         }else{
             send(rows);
         }
@@ -193,7 +212,6 @@ app.get('/airline/:page', (req, res)=>{
     let send = function(airlineData){
         fs.readFile(path.join(template,"/temp.html"), 'utf-8', (err, data)=>{
             let response;
-            let page = req.params.page;
             let pageInc = 1;
             let begin = (page-1)*pageInc;
             let prev = page==1?'<a><span class = "disabled-button">Prev</span></a>':
@@ -201,7 +219,7 @@ app.get('/airline/:page', (req, res)=>{
             let next = airlineData.length - pageInc <= begin?'<span class = "disabled-button">Next</span>':
                 '<a href="/airline/'+(parseInt(page)+1)+'"><span class="enabled-button">Next</span></a>';
             if(page<=0||begin >= airlineData.length){
-                res.status(404).type('html').send("Could not find");
+                sendError(res, null);
                 return;
             }
 
@@ -228,6 +246,11 @@ app.get('/date/:tf/:page', (req, res) => {
     let query = '';
     let tableData = [];
 
+    if(isNaN(page)){
+        sendError(res, null);
+        return;
+    }
+
     if (timeFrame == '1985-1999') {
         tableData = ["incidents_85_99", "fatal_accidents_85_99", "fatalities_85_99"];
         query = 'SELECT airline, incidents_85_99, fatal_accidents_85_99, fatalities_85_99, avail_seat_km_per_week FROM Airlines';
@@ -238,10 +261,9 @@ app.get('/date/:tf/:page', (req, res) => {
 
     db.all(query, (err, rows) => {
         if (err) {
-          res.status(404).type('html').send("Query not found")
-          console.log(err);
+            sendError(res, 'Query Not Found');
         } else {
-          send(rows);
+            send(rows);
         }
     });
 
@@ -256,7 +278,7 @@ app.get('/date/:tf/:page', (req, res) => {
             '<a href="/date/' + timeFrame + '/' + (parseInt(page) + 1) + '"><span class="enabled-button">Next</span></a>';
     
           if (page <= 0 || begin >= airlineData.length) {
-            res.status(404).type('html').send("Could not find");
+            sendError(res, null);
             return;
           }
     
@@ -276,6 +298,9 @@ app.get('/date/:tf/:page', (req, res) => {
     
 });
 
+app.all('*', (req, res) => { 
+    sendError(res, null);
+}); 
 
 
 app.listen(port, () => {

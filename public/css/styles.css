@@ -44,8 +44,8 @@ img{
 .shadowed-block {
     padding: 1rem;
     background-color: white;
-    border-radius: 10px; /*remember to convert to rems*/
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.3);
+    border-radius: 1rem; /*remember to convert to rems*/
+    box-shadow: 0 0.25rem 0.5rem 0 rgba(0, 0, 0, 0.3); /*remember to convert to rems*/
     margin: 0 auto; /* Center the block horizontally */
 }
 
@@ -97,4 +97,10 @@ img{
 .button-container{
     margin-left: 0.5rem;
     margin-top: 0.5rem;
+}
+
+.center{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
