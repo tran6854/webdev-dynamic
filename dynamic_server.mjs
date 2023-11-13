@@ -55,8 +55,7 @@ function makeBarGraph (data, type, label, col, nickname, addKM, page, pageInc){
     }
     //creating actual graph
     graphData = 'data:[\n';
-  
-    // graphData += '{toolTipContent: "test",\n';
+
     let q='\'\\"\'';
     for(let i=0; i<columns.length; i++){
         let column = columns[i];
@@ -158,7 +157,6 @@ app.get('/km/:eq/:num/:page', (req, res)=>{
     let query='SELECT * From Airlines WHERE avail_seat_km_per_week '+equality+' ?';
     db.all(query, [num], (err, rows)=>{
         if(err){
-            // res.status(404).type('html').send("Query Not Found")
             sendError(res, 'Query Not Found');
         }else{
             send(rows);
@@ -175,7 +173,6 @@ app.get('/km/:eq/:num/:page', (req, res)=>{
             let next = airlineData.length - pageInc <= begin?'<span class = "disabled-button">Next</span>':
                 '<a href="/km/'+eq+'/'+num+'/'+(parseInt(page)+1)+'"><span class="enabled-button">Next</span></a>';
             if(page<=0||begin >= airlineData.length){
-                // res.status(404).type('html').send("Could not find");
                 sendError(res, null);
                 return;
             }
