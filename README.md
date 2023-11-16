@@ -1,5 +1,5 @@
 # Web Dev - Dynamic Server
-Dynamic Server Starter Code for Web Development Course.<br>
+Dynamic Server for Web Development Course.<br>
 This page features a database of airline information.
 
 # See Page
