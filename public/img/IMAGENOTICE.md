@@ -1,5 +1,5 @@
 # PLEASE NOTE
-This pictures, name, and background information about these people in the leadership.html are NOT real.
+The pictures, name, and background information about these people in the leadership.html are NOT real.
 The images were sourced from <a href="https://thispersondoesnotexist.com">thispersondoesnotexist.com</a>,
  and the background information and names were all made up. <br>
 <br>
